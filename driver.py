@@ -4,7 +4,7 @@ import threading
 from collections import deque
 from typing import Optional
 import serial
-from gpiozero import LED, DigitalInputDevice
+from gpiozero import OutputDevice, InputDevice
 
 from .pins import LoRaPins
 from .enums import LoraMode
