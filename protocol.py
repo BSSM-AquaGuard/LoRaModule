@@ -1,13 +1,13 @@
 import struct
 from dataclasses import dataclass
 
-FMT = "<HfBB"  # ESP32 구조체랑 반드시 동일
+FMT = "<HffI"  # C struct: uint16 id, float temp, float turbidity, uint32 timestamp
 
 @dataclass
 class DataPacket:
     id: int
     temperature: float
-    turbidity: int
+    turbidity: float
     timestamp: int
 
     @staticmethod
