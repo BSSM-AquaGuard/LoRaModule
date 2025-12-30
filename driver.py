@@ -4,15 +4,15 @@ import threading
 from collections import deque
 from typing import Optional
 import serial
-from gpiozero import OutputDevice, InputDevice
+from gpiozero import LED, DigitalInputDevice
 
-from .pins import LoraPins
+from .pins import LoRaPins
 from .enums import LoraMode
 from .protocol import DataPacket, FMT
 from .exceptions import AuxTimeoutError
 
 class LoraDriver:
-    def __init__(self, port: str, baudrate: int, pins: LoraPins, buffer_size: int = 200, start_listener: bool = True):
+    def __init__(self, port: str, baudrate: int, pins: LoRaPins, buffer_size: int = 200, start_listener: bool = True):
         self.serial = serial.Serial(port, baudrate, timeout=1)
         self.pins = pins
         self._packet_size = struct.calcsize(FMT)
@@ -63,7 +63,7 @@ class LoraDriver:
             return DataPacket.decode(raw)
         return None
 
-    def receive(self) -> DataPacket | None:
+    def receive(self) -> Optional[DataPacket]:
         # synchronous pull API (kept for backward compatibility)
         return self._receive_once()
 
