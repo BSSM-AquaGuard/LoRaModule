@@ -6,8 +6,8 @@ FMT = "<HfffI"  # C struct: uint16 id, float temp, float turbidity, uint32 times
 @dataclass
 class DataPacket:
     id: int
-    temperature: float
     ph: float
+    temperature: float
     turbidity: float
     timestamp: int
     
@@ -20,8 +20,8 @@ class DataPacket:
     def encode(self) -> bytes:
         return struct.pack(FMT,
             self.id,
+            self.ph,
             self.temperature,
-            self.ph
             self.turbidity,
             self.timestamp
             
