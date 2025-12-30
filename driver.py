@@ -4,7 +4,7 @@ import threading
 from collections import deque
 from typing import Optional
 import serial
-import RPi.GPIO as GPIO
+from gpiozero import LED, DigitalInputDevice
 
 from .pins import LoraPins
 from .enums import LoraMode
@@ -17,9 +17,10 @@ class LoraDriver:
         self.pins = pins
         self._packet_size = struct.calcsize(FMT)
 
-        GPIO.setmode(GPIO.BCM)
-        for p in (pins.m0, pins.m1, pins.aux):
-            GPIO.setup(p, GPIO.OUT if p != pins.aux else GPIO.IN)
+        # GPIO 설정
+        self.m0 = LED(pins.m0)
+        self.m1 = LED(pins.m1)
+        self.aux = DigitalInputDevice(pins.aux)
 
         self.set_mode(LoraMode.NORMAL)
 
@@ -33,14 +34,14 @@ class LoraDriver:
 
     def wait_aux(self, timeout=1.0):
         start = time.time()
-        while GPIO.input(self.pins.aux) == 0:
+        while not self.aux.value:  # AUX가 HIGH 될 때까지 대기
             if time.time() - start > timeout:
                 raise AuxTimeoutError("AUX timeout")
             time.sleep(0.001)
 
     def set_mode(self, mode: LoraMode):
-        GPIO.output(self.pins.m0, mode.value[0])
-        GPIO.output(self.pins.m1, mode.value[1])
+        self.m0.value = mode.value[0]
+        self.m1.value = mode.value[1]
         self.wait_aux()
 
     def send(self, packet: DataPacket):
@@ -54,7 +55,7 @@ class LoraDriver:
             return DataPacket.decode(raw)
         return None
 
-    def receive(self) -> DataPacket | None:
+    def receive(self) -> Optional[DataPacket]:
         # synchronous pull API (kept for backward compatibility)
         return self._receive_once()
 

@@ -9,6 +9,7 @@ class DataPacket:
     temperature: float
     turbidity: float
     timestamp: int
+    ph: float
 
     @staticmethod
     def decode(raw: bytes) -> "DataPacket":
@@ -20,5 +21,6 @@ class DataPacket:
             self.id,
             self.temperature,
             self.turbidity,
-            self.timestamp
+            self.timestamp,
+            self.ph
         )
