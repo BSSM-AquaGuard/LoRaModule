@@ -1,15 +1,16 @@
 import struct
 from dataclasses import dataclass
 
-FMT = "<HffI"  # C struct: uint16 id, float temp, float turbidity, uint32 timestamp
+FMT = "<HfffI"  # C struct: uint16 id, float temp, float turbidity, uint32 timestamp
 
 @dataclass
 class DataPacket:
     id: int
     temperature: float
+    ph: float
     turbidity: float
     timestamp: int
-    ph: float
+    
 
     @staticmethod
     def decode(raw: bytes) -> "DataPacket":
@@ -20,7 +21,8 @@ class DataPacket:
         return struct.pack(FMT,
             self.id,
             self.temperature,
-            self.turbidity,
-            self.timestamp,
             self.ph
+            self.turbidity,
+            self.timestamp
+            
         )

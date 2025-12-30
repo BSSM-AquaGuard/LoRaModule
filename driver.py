@@ -6,13 +6,13 @@ from typing import Optional
 import serial
 from gpiozero import LED, DigitalInputDevice
 
-from .pins import LoraPins
+from .pins import LoRaPins
 from .enums import LoraMode
 from .protocol import DataPacket, FMT
 from .exceptions import AuxTimeoutError
 
 class LoraDriver:
-    def __init__(self, port: str, baudrate: int, pins: LoraPins, buffer_size: int = 200, start_listener: bool = True):
+    def __init__(self, port: str, baudrate: int, pins: LoRaPins, buffer_size: int = 200, start_listener: bool = True):
         self.serial = serial.Serial(port, baudrate, timeout=1)
         self.pins = pins
         self._packet_size = struct.calcsize(FMT)
