@@ -1,7 +1,7 @@
 import struct
 from dataclasses import dataclass
 
-FMT = "<HfffI"  # C struct: uint16 id, float temp, float turbidity, uint32 timestamp
+FMT = "<HffffIB"  # C struct: uint16 id, float ph, float temp, float turbidity, uint32 timestamp, uint8 redTide (19 bytes)
 
 @dataclass
 class DataPacket:
@@ -10,6 +10,7 @@ class DataPacket:
     temperature: float
     turbidity: float
     timestamp: int
+    redTide: int  # 0: 정상, 1: 적조 감지
     
 
     @staticmethod
@@ -23,6 +24,6 @@ class DataPacket:
             self.ph,
             self.temperature,
             self.turbidity,
-            self.timestamp
-            
+            self.timestamp,
+            self.redTide
         )
