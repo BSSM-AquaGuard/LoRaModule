@@ -17,10 +17,10 @@ class LoraDriver:
         self.pins = pins
         self._packet_size = struct.calcsize(FMT)
 
-        # GPIO 설정
-        self.m0 = LED(pins.m0)
-        self.m1 = LED(pins.m1)
-        self.aux = DigitalInputDevice(pins.aux)
+        # GPIO Zero 초기화
+        self._m0 = OutputDevice(pins.m0)
+        self._m1 = OutputDevice(pins.m1)
+        self._aux = InputDevice(pins.aux)
 
         self.set_mode(LoraMode.NORMAL)
 
@@ -34,14 +34,22 @@ class LoraDriver:
 
     def wait_aux(self, timeout=1.0):
         start = time.time()
-        while not self.aux.value:  # AUX가 HIGH 될 때까지 대기
+        while self._aux.value == 0:
             if time.time() - start > timeout:
                 raise AuxTimeoutError("AUX timeout")
             time.sleep(0.001)
 
     def set_mode(self, mode: LoraMode):
-        self.m0.value = mode.value[0]
-        self.m1.value = mode.value[1]
+        if mode.value[0]:
+            self._m0.on()
+        else:
+            self._m0.off()
+            
+        if mode.value[1]:
+            self._m1.on()
+        else:
+            self._m1.off()
+            
         self.wait_aux()
 
     def send(self, packet: DataPacket):
@@ -88,4 +96,7 @@ class LoraDriver:
 
     def close(self):
         self.stop_listener()
+        self._m0.close()
+        self._m1.close()
+        self._aux.close()
         self.serial.close()
